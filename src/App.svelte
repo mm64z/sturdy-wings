@@ -1,46 +1,56 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import Counter from './lib/Counter.svelte'
+  import { onMount } from 'svelte';
+  import Tab, { Label } from '@smui/tab';
+  import TabBar from '@smui/tab-bar';
+
+  import BillingCostChart from "./components/BillingCostChart.svelte";
+  import BillingEnergyChart from "./components/BillingEnergyChart.svelte";
+  import ReadingsChart from "./components/ReadingsChart.svelte";
+  import { billsCosts, billsEnergy, readings } from "./stores";
+  import { formatBillsCost, formatBillsEnergy, formatReadings } from "./utils/formatData";
+
+  let items = [
+    { label: "Billing Cost",
+		 value: 1,
+		 component: BillingCostChart
+		},
+    { label: "Billing Energy",
+		 value: 2,
+		 component: BillingEnergyChart
+		},
+    { label: "Readings",
+		 value: 3,
+		 component: ReadingsChart
+		}
+  ];
+
+  let active = items[0].label;
+
+  onMount(async () => {
+    $billsCosts = await formatBillsCost();
+    $billsEnergy = await formatBillsEnergy();
+    $readings = await formatReadings();
+  })
+
 </script>
 
-<main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer"> 
-      <img src="/vite.svg" class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer"> 
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
+<div id="main">
+  <TabBar tabs={items.map((i) => i.label)} let:tab bind:active>
+    <Tab {tab}>
+      <Label>{tab}</Label>
+    </Tab>
+  </TabBar>
+  {#each items as item}
+    {#if item.label === active}
+      <svelte:component this={item.component}/>
+    {/if}
+  {/each}
+</div>
 
-  <div class="card">
-    <Counter />
-  </div>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
-</main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
+  #main {
+    width: 80vw;
+    height: 80vh;
   }
 </style>
