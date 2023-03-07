@@ -29,6 +29,8 @@ export async function formatReadings () {
     return {
       ...dataSetBase,
       label: datum.type,
+      borderColor: '#0C463E',
+      pointBorderColor: '#136F63',
       data: yValues
     }
   })
@@ -68,14 +70,20 @@ export async function formatBillsCost () {
   let datasets = [{
     ...dataSetBase,
     label: 'Cost',
+    borderColor: '#0C463E',
+    pointBorderColor: '#136F63',
     data: []
   },{
     ...dataSetBase,
     label: 'Cost (TND)',
+    borderColor: '#AE2D09',
+    pointBorderColor: '#F34213',
     data: []
   }, {
     ...dataSetBase,
     label: 'Cost (Gen)',
+    borderColor: '#6A5E11',
+    pointBorderColor: '#C2AC1E',
     data: []
   }]
   billsData.data.forEach((datum) => {
@@ -121,10 +129,14 @@ export async function formatBillsEnergy () {
   let datasets = [{
     ...dataSetBase,
     label: 'Use (kW)',
+    borderColor: '#0C463E',
+    pointBorderColor: '#12695D',
     data: []
   },{
     ...dataSetBase,
     label: 'Demand (kW)',
+    borderColor: '#8C031A',
+    pointBorderColor: '#C80425',
     data: []
   }]
   billsData.data.forEach((datum) => {
@@ -147,20 +159,18 @@ function mergeUnique(array1, array2) {
 }
 
 const dataSetBase = {
-  fill: true,
   lineTension: 0.3,
-  backgroundColor: 'rgba(225, 204, 230, .3)',
   borderColor: 'rgb(205, 130, 158)',
   borderCapStyle: 'butt',
   borderDash: [],
   borderDashOffset: 0.0,
   borderJoinStyle: 'miter',
-  pointBorderColor: 'rgb(205, 130,1 58)',
+  pointBorderColor: 'rgb(205, 130, 138)',
   pointBackgroundColor: 'rgb(255, 255, 255)',
   pointBorderWidth: 10,
   pointHoverRadius: 5,
   pointHoverBackgroundColor: 'rgb(0, 0, 0)',
-  pointHoverBorderColor: 'rgba(220, 220, 220,1)',
+  pointHoverBorderColor: 'rgba(220, 220, 220, 1)',
   pointHoverBorderWidth: 2,
   pointRadius: 1,
   pointHitRadius: 10,

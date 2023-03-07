@@ -1,6 +1,6 @@
 
 <script>
-  import Chartjs from "../lib/Chartjs.svelte";
+  import Chartjs from "../lib/ChartAdapter.svelte";
   import { readings } from "../stores";
 
   let data;

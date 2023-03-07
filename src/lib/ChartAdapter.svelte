@@ -1,5 +1,6 @@
 <script>
   import { Line } from 'svelte-chartjs';
+  import zoomPlugin from 'chartjs-plugin-zoom';
 
   import {
     Chart as ChartJS,
@@ -19,10 +20,25 @@
     LineElement,
     LinearScale,
     PointElement,
-    CategoryScale
+    CategoryScale,
+    zoomPlugin,
   );
 
   export let data;
 </script>
 
-<Line {data} options={{ responsive: true }} />
+<Line {data} options={{ 
+  responsive: true, 
+  plugins: {
+    zoom: {
+      pan: {
+        enabled: true,
+      },
+      zoom: {
+        wheel: {
+          enabled: true,
+        },
+        mode: 'x',
+      }
+    }
+  }}} />
