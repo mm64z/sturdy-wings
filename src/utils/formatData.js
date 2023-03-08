@@ -1,5 +1,8 @@
 import { getBills, getReadings } from "./fetchData"
 
+
+
+
 /**
  * given {"data": [
         {
@@ -18,13 +21,14 @@ import { getBills, getReadings } from "./fetchData"
  * },...]}
  * 
  */
-export async function formatReadings () {
-  const readingData = await getReadings();
+export function formatReadings (rawReadings) {
   let xValues = [];
-  const datasets = readingData.data.map((datum) => {
+  const datasets = rawReadings.data.map((datum) => {
     const kwEntries = datum.attributes.readings.kw
     const potentialX = Object.keys(kwEntries);
-    xValues = mergeUnique(xValues, potentialX);
+    if (xValues.length === 0) // sample data only has one entry
+      // but would need to figure how to map time to entry, and what to do for missing
+      xValues = potentialX;
     const yValues = Object.values(kwEntries);
     return {
       ...dataSetBase,
@@ -37,6 +41,81 @@ export async function formatReadings () {
   return {
     labels: xValues,
     datasets,
+  }
+}
+
+export const TimeGroupings = {
+  HOURLY: {
+    label: "Hourly",
+  },
+  DAILY: {
+    label: "Daily",
+  },
+  MONTHLY: {
+    label: "Monthly",
+  },
+}
+/**
+ *  {"data": [
+ * {
+ *   "id": "2080448990210",
+ *   "type": "meter-reading",
+ *   "attributes": {
+ *       "readings": {
+ *           "kw": {
+ *               "2022-08-01T00:00:00-07:00": 9.6,
+ *                ...
+ * }}}}]}
+ * return same format, condensed by a time grouping
+ * time looks like "2022-08-01T00:00:00-07:00" 
+ * currently will condense by averages, could accept a function to do something else*/
+export function sortReadingsByTime (rawReadings, grouping) {
+  const condenseFunc = ((numbers) => {
+    const sum = numbers.reduce((acc,number)=>{ return acc + number },0);
+    return sum/numbers.length;
+  })
+  const newData = rawReadings.data.map((datum) => {
+    const kw = datum.attributes.readings.kw;
+    const times = Object.keys(kw)
+    let newKw = {};
+    let timeFunc;
+    if (grouping === TimeGroupings.DAILY.label) {
+      timeFunc = (time) => time.slice(0,10) // yyyy-mm-dd
+    } else if (grouping === TimeGroupings.MONTHLY.label) {
+      timeFunc = (time) => time.slice(0,7) // yyyy-mm
+    } else if (grouping === TimeGroupings.HOURLY.label) {
+      timeFunc = (time) => time.slice(0,13) // yyyy-mm-ddThh
+    } else { // no change
+      timeFunc = (time) => time
+    }
+    times.forEach((time) => {
+      const newTime = timeFunc(time);
+      if (newTime in newKw) {
+        newKw[newTime].push(kw[time]);
+      } else {
+        newKw[newTime] = [kw[time]];
+      }
+    })
+
+    Object.keys(newKw).forEach((newTime) => {
+      const aggregate = condenseFunc(newKw[newTime]);
+      newKw[newTime] = aggregate;
+    })
+
+    return {
+      ...datum, 
+      attributes: {
+        ...datum.attributes, 
+        readings: {
+          ...datum.attributes.readings,
+          kw: newKw
+        }
+      }
+    }
+  });
+
+  return {
+    data: newData,
   }
 }
 
@@ -64,8 +143,7 @@ export async function formatReadings () {
  * },...]}
  * 
  */
-export async function formatBillsCost () {
-  const billsData = await getBills();
+export function formatBillsCost (billsData) {
   let xValues = [];
   let datasets = [{
     ...dataSetBase,
@@ -123,8 +201,7 @@ export async function formatBillsCost () {
  * },...]}
  * 
  */
-export async function formatBillsEnergy () {
-  const billsData = await getBills();
+export function formatBillsEnergy (billsData) {
   let xValues = [];
   let datasets = [{
     ...dataSetBase,

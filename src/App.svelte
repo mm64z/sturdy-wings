@@ -6,8 +6,9 @@
   import BillingCostChart from "./components/BillingCostChart.svelte";
   import BillingEnergyChart from "./components/BillingEnergyChart.svelte";
   import ReadingsChart from "./components/ReadingsChart.svelte";
-  import { billsCosts, billsEnergy, readings } from "./stores";
-  import { formatBillsCost, formatBillsEnergy, formatReadings } from "./utils/formatData";
+  import { billsCosts, billsEnergy, rawReadings,  } from "./stores";
+  import { formatBillsCost, formatBillsEnergy } from "./utils/formatData";
+    import { getBills, getReadings } from './utils/fetchData';
 
   let items = [
     { label: "Billing Cost",
@@ -27,9 +28,11 @@
   let active = items[0].label;
 
   onMount(async () => {
-    $billsCosts = await formatBillsCost();
-    $billsEnergy = await formatBillsEnergy();
-    $readings = await formatReadings();
+    const rawBillingData = await getBills();
+    const rawReadingData = await getReadings();
+    $billsCosts = formatBillsCost(rawBillingData);
+    $billsEnergy = formatBillsEnergy(rawBillingData);
+    $rawReadings = rawReadingData;
   })
 
 </script>

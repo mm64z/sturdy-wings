@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@smui/form-field": "*",
+    "@smui/radio": "*",
     "@smui/tab": "*",
     "@smui/tab-bar": "*",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",

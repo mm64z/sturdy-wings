@@ -29,6 +29,12 @@
 
 <Line {data} options={{ 
   responsive: true, 
+  scales: {
+    y: {
+      axis: 'y',
+      suggestedMin: 0,
+    }
+  },
   plugins: {
     zoom: {
       pan: {
@@ -38,7 +44,8 @@
         wheel: {
           enabled: true,
         },
-        mode: 'x',
+        mode: 'xy',
+        scaleMode: 'xy',
       }
     }
   }}} />
